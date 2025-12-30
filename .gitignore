@@ -1,0 +1,27 @@
+ Environment variables - NEVER COMMIT
+.env
+.env.local
+.env.production
+
+# Terraform state - contains sensitive data
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfvars
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ChromaDB local data
+chroma_db/

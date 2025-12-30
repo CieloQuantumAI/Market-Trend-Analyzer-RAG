@@ -1,0 +1,9 @@
+# ============================================
+# Terraform Variables - Development
+# Copy to terraform.tfvars and customize
+# ============================================
+
+project_name = "market-trend-rag"
+environment  = "dev"
+location     = "eastus"
+search_sku   = "free"  # Options: free, basic, standard

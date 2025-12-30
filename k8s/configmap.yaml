@@ -1,0 +1,30 @@
+# ============================================
+# Kubernetes ConfigMap
+# Non-sensitive configuration
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: market-trend-config
+  namespace: market-trend
+  labels:
+    app: market-trend-analyzer
+data:
+  # Application settings
+  PYTHONUNBUFFERED: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  
+  # Azure AI Search settings
+  AZURE_SEARCH_INDEX_NAME: "market-news"
+  
+  # Model settings
+  EMBEDDING_MODEL: "text-embedding-3-small"
+  LLM_MODEL: "gpt-4o-mini"
+  
+  # RAG settings
+  CHUNK_SIZE: "500"
+  CHUNK_OVERLAP: "100"
+  TOP_K: "5"
+  
+  # Feature flags
+  USE_AZURE_OPENAI: "false"  # Set to "true" if using Azure OpenAI

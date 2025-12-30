@@ -1,0 +1,89 @@
+# ============================================
+# Kubernetes Deployment
+# Market Trend Analyzer RAG
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: market-trend-analyzer
+  namespace: market-trend
+  labels:
+    app: market-trend-analyzer
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: market-trend-analyzer
+  template:
+    metadata:
+      labels:
+        app: market-trend-analyzer
+        version: v1
+    spec:
+      containers:
+        - name: market-trend-analyzer
+          image: market-trend-analyzer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8501
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: market-trend-config
+            - secretRef:
+                name: market-trend-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      restartPolicy: Always
+---
+# ============================================
+# Kubernetes Service
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: market-trend-analyzer-service
+  namespace: market-trend
+  labels:
+    app: market-trend-analyzer
+spec:
+  type: LoadBalancer  # Use NodePort for local k8s without LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8501
+      protocol: TCP
+      name: http
+  selector:
+    app: market-trend-analyzer
+---
+# ============================================
+# Kubernetes Namespace
+# ============================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: market-trend
+  labels:
+    name: market-trend

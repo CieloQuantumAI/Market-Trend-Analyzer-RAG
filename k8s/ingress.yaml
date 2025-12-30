@@ -1,0 +1,39 @@
+# ============================================
+# Kubernetes Ingress (Optional)
+# For production with custom domain
+# Requires ingress controller (nginx, traefik, etc.)
+# ============================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: market-trend-analyzer-ingress
+  namespace: market-trend
+  labels:
+    app: market-trend-analyzer
+  annotations:
+    # Nginx ingress annotations
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    # Enable websockets for Streamlit
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: market-trend.local  # Change to your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: market-trend-analyzer-service
+                port:
+                  number: 80
+  # Uncomment for TLS
+  # tls:
+  #   - hosts:
+  #       - market-trend.yourdomain.com
+  #     secretName: market-trend-tls

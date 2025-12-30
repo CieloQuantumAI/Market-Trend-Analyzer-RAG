@@ -1,0 +1,51 @@
+# ============================================
+# Docker Compose for Local Development
+# ============================================
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: market-trend-analyzer
+    ports:
+      - "8501:8501"
+    environment:
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_SEARCH_ENDPOINT=${AZURE_SEARCH_ENDPOINT}
+      - AZURE_SEARCH_API_KEY=${AZURE_SEARCH_API_KEY}
+      - AZURE_SEARCH_INDEX_NAME=${AZURE_SEARCH_INDEX_NAME:-market-news}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - NEWS_API_KEY=${NEWS_API_KEY}
+      - USE_AZURE_OPENAI=${USE_AZURE_OPENAI:-false}
+    volumes:
+      # Mount for development hot-reload (comment out for production testing)
+      - ./src:/app/src:ro
+      - ./app.py:/app/app.py:ro
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Local Redis for caching (future enhancement)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: market-trend-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+
+# volumes:
+#   redis_data:
+
+networks:
+  default:
+    name: market-trend-network
